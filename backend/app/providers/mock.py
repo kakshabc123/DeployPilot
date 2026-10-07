@@ -75,6 +75,10 @@ class MockProvider(DeploymentProvider):
         d = self._d[deployment_id]
         if d["status"] not in TERMINAL:
             d["status"] = DeployStatus.CANCELED
+            for task_name in ("task", "deploy_task"):
+                task = d.get(task_name)
+                if task is not None and not task.done():
+                    task.cancel()
             self._log(deployment_id, "Canceled by user")
 
     async def rollback(self, deployment_id: str, target_id: str) -> str:
